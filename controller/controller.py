@@ -1,4 +1,5 @@
 import pygame
+from pygame.locals import *
 import typing
 
 
@@ -21,7 +22,7 @@ class Controller:
 
 
 class JoystickController(Controller):
-	def __init__(self):
+	def __init__(self) -> None:
 		pygame.joystick.init()
 		assert pygame.joystick.get_count() >= 1
 
@@ -53,8 +54,44 @@ class JoystickController(Controller):
 			right = right**3
 			left = left**3
 		else:
-			right = arm_y
-			left = arm_y
+			right = left = arm_y
+
+		return {
+			'body': {
+				'right': right,
+				'left': left,
+			},
+			'arm': arm,
+		}
+
+
+class KeyboardController(Controller):
+	def __init__(self) -> None:
+		self.grabbed = False
+
+	def get_input(self) -> dict:
+		key = pygame.key.get_pressed()
+
+		if key[K_f]:
+			self.grabbed = True
+		elif key[K_r] and not key[K_UP] and not key[K_DOWN] and not key[K_LEFT] and not key[K_RIGHT]:
+			self.grabbed = False
+
+		arm = {
+			'horizontal': key[K_a] - key[K_d],
+			'vertical': key[K_e] - key[K_q],
+			'grab': int(self.grabbed),
+		}
+		arm_y = (key[K_w] - key[K_s]) / 2
+
+		if arm['horizontal'] == 0 and arm['vertical'] == 0 and arm_y == 0:
+			x = key[K_LEFT] - key[K_RIGHT]
+			y = key[K_UP] - key[K_DOWN]
+
+			right = max(-1.0, min(1.0, y + x))
+			left = max(-1.0, min(1.0, y - x))
+		else:
+			right = left = arm_y
 
 		return {
 			'body': {
