@@ -12,7 +12,7 @@ class Window:
 
 	def __init__(self, controller: Controller, communicator: Communicator) -> None:
 		pygame.init()
-		self.screen = pygame.display.set_mode([self.width, self.height])
+		self.screen = pygame.display.set_mode([self.width, self.height], pygame.RESIZABLE)
 		self.clock = pygame.time.Clock()
 		self.controller = controller
 		self.communicator = communicator
@@ -23,6 +23,10 @@ class Window:
 				if e.type == pygame.QUIT:
 					pygame.quit()
 					sys.exit(0)
+				elif e.type == pygame.VIDEORESIZE:
+					self.width = e.w
+					self.height = e.h
+					self.screen = pygame.display.set_mode((e.w, e.h), pygame.RESIZABLE)
 
 			self.communicator.write(*self.controller)
 
