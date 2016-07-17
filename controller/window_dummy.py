@@ -19,7 +19,7 @@ class DummyWindow(Window):
 		self.y += math.sin(self.heading) * (inp['body']['left'] + inp['body']['right'])
 		self.heading += (inp['body']['left'] - inp['body']['right']) / 40
 
-		self.arm_h -= inp['arm']['horizontal'] / 2
+		self.arm_h += inp['arm']['horizontal'] / 2
 		self.arm_v = max(0.1, min(0.7, self.arm_v + inp['arm']['vertical'] / 100))
 
 		self.draw_bar(0.05, 0.1, 0.10, 0.9, inp['body']['left'], False)
