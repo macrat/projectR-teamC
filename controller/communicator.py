@@ -1,4 +1,3 @@
-import logging
 import struct
 
 import serial
@@ -20,15 +19,42 @@ class Communicator:
 	def write(self, *data) -> None:
 		raise NotImplemented()
 
+	def decode_dle(self, data: bytes) -> bytes:
+		"""
+		>>> Communicator().decode_dle(b'\\x10\\x02hello\\x10\\x03')
+		b'hello'
+		>>> Communicator().decode_dle(b'\\x10\\x02\\x01\\x10\\x10\\x11\\x10\\x03')
+		b'\\x01\\x10\\x11'
+		>>> Communicator().decode_dle(b'hello')
+		Traceback (most recent call last):
+			...
+		ValueError: ('invalid format data', b'hello')
+		"""
+
+		if data[:2] != b'\x10\x02' or data[-2:] != b'\x10\x03':
+			raise ValueError('invalid format data', data)
+
+		return data[2:-2].replace(b'\x10\x10', b'\x10')
+
+	def encode_dle(self, data: bytes) -> bytes:
+		"""
+		>>> Communicator().encode_dle(b'hello')
+		b'\\x10\\x02hello\\x10\\x03'
+		>>> Communicator().encode_dle(b'\\x01\\x10\\x11')
+		b'\\x10\\x02\\x01\\x10\\x10\\x11\\x10\\x03'
+		"""
+
+		return b'\x10\x02' + data.replace(b'\x10', b'\x10\x10') + b'\x10\x03'
+
 
 class DummyCommunicator(Communicator):
 	def read(self) -> tuple:
-		logging.getLogger('DummyCommunicator').debug('reading')
+		print('DummyCommunicator: reading')
 		return ()
 
 	def write(self, *data) -> None:
-		logging.getLogger('DummyCommunicator').debug('writing {}'.format(data))
-		pass
+		print('DummyCommunicator: writing: {}'.format(data))
+
 
 class StructSerial(Communicator):
 	def __init__(self, serial: serial.Serial, fmt: str) -> None:
@@ -38,19 +64,39 @@ class StructSerial(Communicator):
 	def close(self) -> None:
 		self.serial.close()
 
+	def decode(self, data: bytes) -> tuple:
+		"""
+		>>> StructSerial(None, '<i').decode(b'\\x10\\x02\\x01\\x00\\x00\\x00\\x10\\x03')
+		(1,)
+		>>> StructSerial(None, '<bb').decode(b'\\x10\\x02\\x01\\x02\\x10\\x03')
+		(1, 2)
+		"""
+
+		return self.struct.unpack(self.decode_dle(data))
+
 	def read(self) -> tuple:
 		buf = b''
+
 		for x in self.serial.read(1):
 			buf += x
+
 			if buf.endswith(b'\x10\x02'):
-				buf = b''
+				buf = b'\x10\x02'
 			elif buf.endswith(b'\x10\x03'):
-				return self.struct.unpack(buf[:-2].replace(b'\x10\x10', '\x10'))
+				return self.decode(buf)
+
+	def encode(self, *data) -> bytes:
+		"""
+		>>> StructSerial(None, '<i').encode(1)
+		b'\\x10\\x02\\x01\\x00\\x00\\x00\\x10\\x03'
+		>>> StructSerial(None, '<bb').encode(1, 16)
+		b'\\x10\\x02\\x01\\x10\\x10\\x10\\x03'
+		"""
+
+		return self.encode_dle(self.struct.pack(*data))
 
 	def write(self, *data) -> None:
-		data = self.struct.pack(*data)
-		data = b'\x10\x02' + data.replace(b'\x10', b'\x10\x10') + b'\x10\x03'
-		self.serial.write(data)
+		self.serial.write(self.encode(*data))
 
 
 class AsymmetryStructSerial(Communicator):
