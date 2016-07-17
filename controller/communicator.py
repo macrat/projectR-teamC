@@ -39,10 +39,18 @@ class StructSerial(Communicator):
 		self.serial.close()
 
 	def read(self) -> tuple:
-		return self.struct.unpack(self.serial.read(self.struct.size))
+		buf = b''
+		for x in self.serial.read(1):
+			buf += x
+			if buf.endswith(b'\x10\x02'):
+				buf = b''
+			elif buf.endswith(b'\x10\x03'):
+				return self.struct.unpack(buf[:-2].replace(b'\x10\x10', '\x10'))
 
 	def write(self, *data) -> None:
-		self.serial.write(self.struct.pack(*data))
+		data = self.struct.pack(*data)
+		data = b'\x10\x02' + data.replace(b'\x10', b'\x10\x10') + b'\x10\x03'
+		self.serial.write(data)
 
 
 class AsymmetryStructSerial(Communicator):
