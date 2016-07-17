@@ -22,10 +22,8 @@ class DummyWindow(Window):
 		self.arm_h -= inp['arm']['horizontal'] / 2
 		self.arm_v = max(0.1, min(0.7, self.arm_v + inp['arm']['vertical'] / 100))
 
-		for x, name in ((20, 'left'), (40, 'right')):
-			pygame.draw.rect(self.screen, (255, 255, 255), (x, self.height/2-self.height/3, 20, self.height*2/3), 1)
-			pygame.draw.rect(self.screen, (255, 255, 255), (x, self.height/2, 20, -inp['body'][name]*self.height/3))
-
+		self.draw_bar(0.05, 0.1, 0.10, 0.9, inp['body']['left'], False)
+		self.draw_bar(0.10, 0.1, 0.15, 0.9, inp['body']['right'], False)
 
 		pygame.draw.circle(
 			self.screen,
