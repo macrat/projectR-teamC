@@ -38,7 +38,7 @@ class JoystickController(Controller):
 			self.grabbed = False
 
 		arm = {
-			'horizontal': -self.joystick.get_axis(3),
+			'horizontal': self.joystick.get_axis(3),
 			'vertical': self.joystick.get_button(6) - self.joystick.get_button(4),
 			'grab': int(self.grabbed),
 		}
@@ -78,7 +78,7 @@ class KeyboardController(Controller):
 			self.grabbed = False
 
 		arm = {
-			'horizontal': key[K_a] - key[K_d],
+			'horizontal': key[K_d] - key[K_a],
 			'vertical': key[K_e] - key[K_q],
 			'grab': int(self.grabbed),
 		}
