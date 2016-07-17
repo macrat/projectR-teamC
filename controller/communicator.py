@@ -56,6 +56,30 @@ class DummyCommunicator(Communicator):
 		print('DummyCommunicator: writing: {}'.format(data))
 
 
+class StructDummyCommunicator(Communicator):
+	def __init__(self, fmt: str) -> None:
+		self.struct = struct.Struct(fmt)
+
+	def read(self) -> tuple:
+		print('StructDummyCommunicator: reading')
+		return ()
+
+	def write(self, *data) -> None:
+		"""
+		>>> StructDummyCommunicator('<ii').write(1, 2)
+		StructDummyCommunicator: writing: 01 00 00 00 | 02 00 00 00
+		"""
+
+		msg = 'StructDummyCommunicator: writing: '
+
+		for i, x in enumerate(self.struct.pack(*data)):
+			if i != 0 and (i + 0) % 4 == 0:
+				msg += '| '
+			msg += '{0:02x} '.format(x)
+
+		print(msg.strip())
+
+
 class StructSerial(Communicator):
 	def __init__(self, serial: serial.Serial, fmt: str) -> None:
 		self.serial = serial
