@@ -46,15 +46,15 @@ class JoystickController(Controller):
 			self.grabbed = False
 
 		arm = {
-			'horizontal': self.joystick.get_axis(3),
-			'vertical': self.joystick.get_button(6) - self.joystick.get_button(4),
+			'horizontal': round(self.joystick.get_axis(3), 2),
+			'vertical': round(self.joystick.get_button(6), 2) - round(self.joystick.get_button(4), 2),
 			'grab': int(self.grabbed),
 		}
-		arm_y = -max(-0.5, min(0.5, self.joystick.get_axis(2) ** 3))
+		arm_y = -(round(self.joystick.get_axis(2), 2) ** 3) / 2
 
 		if abs(arm['horizontal']) < 0.1 and abs(arm['vertical']) < 0.1 and abs(arm_y) < 0.1:
-			x = -self.joystick.get_axis(0)
-			y = -self.joystick.get_axis(1)
+			x = -round(self.joystick.get_axis(0), 2)
+			y = -round(self.joystick.get_axis(1), 2)
 
 			right = max(-1.0, min(1.0, y + x))
 			left = max(-1.0, min(1.0, y - x))
