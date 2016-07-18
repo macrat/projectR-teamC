@@ -4,6 +4,9 @@ import typing
 
 
 class Controller:
+	def __init__(self, communicator) -> None:
+		self.communicator = communicator('<ffffB', '')
+
 	def get_input(self) -> dict:
 		raise NotImplemented()
 
@@ -20,9 +23,14 @@ class Controller:
 			inp['arm']['grab'],
 		))
 
+	def update(self) -> None:
+		self.communicator.write(*self)
+
 
 class JoystickController(Controller):
-	def __init__(self) -> None:
+	def __init__(self, communicator) -> None:
+		super().__init__(communicator)
+
 		pygame.joystick.init()
 		assert pygame.joystick.get_count() >= 1
 
@@ -66,7 +74,9 @@ class JoystickController(Controller):
 
 
 class KeyboardController(Controller):
-	def __init__(self) -> None:
+	def __init__(self, communicator) -> None:
+		super().__init__(communicator)
+
 		self.grabbed = False
 
 	def get_input(self) -> dict:

@@ -4,20 +4,18 @@ import pygame
 import typing
 
 from controller import Controller
-from communicator import Communicator
 
 
 class Window:
 	width = 640
 	height = 480
 
-	def __init__(self, controller: Controller, communicator: Communicator) -> None:
+	def __init__(self, controller: Controller) -> None:
 		pygame.init()
 
 		self.screen = pygame.display.set_mode([self.width, self.height], pygame.RESIZABLE)
 		self.clock = pygame.time.Clock()
 		self.controller = controller
-		self.communicator = communicator
 
 		pygame.font.init()
 		self.font = pygame.font.SysFont(None, 40)
@@ -33,7 +31,7 @@ class Window:
 					self.height = e.h
 					self.screen = pygame.display.set_mode((e.w, e.h), pygame.RESIZABLE)
 
-			self.communicator.write(*self.controller)
+			self.controller.update()
 
 			self.screen.fill((0, 0, 0))
 			self.update()
