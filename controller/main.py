@@ -1,9 +1,9 @@
 import serial
 
-from communicator import StructDummyCommunicator
-from controller import JoystickController
-from window_dummy import DummyWindow
+from communicator import StructSerial
+from controller import KeyboardController
+from window import Window
 
 
 if __name__ == '__main__':
-	DummyWindow(JoystickController(StructDummyCommunicator)).mainloop()
+	Window(KeyboardController(StructSerial.get_instantiator(serial.Serial('/dev/tty.RNBT-92F0-RNI-SPP', 115200)))).mainloop()

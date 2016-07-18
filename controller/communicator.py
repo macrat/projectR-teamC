@@ -122,7 +122,7 @@ class StructSerial(Communicator):
 	@classmethod
 	def get_instantiator(cls, serial: serial.Serial):
 		def StructSerial_instantiator(send_fmt: str, recv_fmt: str) -> StructSerial:
-			return StructSerial(send_fmt, recv_fmt)
+			return StructSerial(serial, send_fmt, recv_fmt)
 		return StructSerial_instantiator
 
 	def close(self) -> None:
@@ -140,4 +140,4 @@ class StructSerial(Communicator):
 				return self.decode(buf)
 
 	def write(self, *data)-> None:
-		self.serial.write(self.encode(data))
+		self.serial.write(self.encode(*data))

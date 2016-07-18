@@ -5,7 +5,7 @@ import typing
 
 class Controller:
 	def __init__(self, communicator) -> None:
-		self.communicator = communicator('<ffffB', '')
+		self.communicator = communicator('<bbbbB', '')
 
 	def get_input(self) -> dict:
 		raise NotImplemented()
@@ -13,18 +13,27 @@ class Controller:
 	def __dict__(self) -> dict:
 		return self.get_input()
 
-	def __iter__(self) -> typing.Iterator:
-		inp = self.get_input()
-		return iter((
-			inp['body']['left'],
-			inp['body']['right'],
-			inp['arm']['horizontal'],
-			inp['arm']['vertical'],
-			inp['arm']['grab'],
-		))
+	def float2fixed(self, x: float) -> int:
+		"""
+		>>> from communicator import DummyCommunicator
+		>>> Controller(DummyCommunicator).float2fixed(1.0)
+		127
+		>>> Controller(DummyCommunicator).float2fixed(-1.0)
+		-127
+		"""
+
+		return int(round(x * 127, 1))
 
 	def update(self) -> None:
-		self.communicator.write(*self)
+		inp = self.get_input()
+
+		self.communicator.write(
+			self.float2fixed(inp['body']['left']),
+			self.float2fixed(inp['body']['right']),
+			self.float2fixed(inp['arm']['horizontal']),
+			self.float2fixed(inp['arm']['vertical']),
+			inp['arm']['grab'],
+		)
 
 
 class JoystickController(Controller):
