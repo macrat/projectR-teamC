@@ -1,7 +1,7 @@
 import sys
+import typing
 
 import pygame
-import typing
 
 from controller import Controller
 

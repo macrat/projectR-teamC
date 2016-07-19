@@ -1,6 +1,7 @@
+import typing
+
 import pygame
 from pygame.locals import *
-import typing
 
 from communicator import Communicator
 

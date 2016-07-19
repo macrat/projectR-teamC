@@ -1,7 +1,7 @@
 import struct
+import typing
 
 import serial
-import typing
 
 
 class Communicator:
