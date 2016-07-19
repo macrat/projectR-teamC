@@ -1,9 +1,16 @@
 import pygame
 from pygame.locals import *
+import typing
+
+from communicator import Communicator
 
 
 class Controller:
-    def __init__(self, communicator) -> None:
+    def __init__(
+            self,
+            communicator: typing.Callable[[str, str], Communicator]
+            ) -> None:
+
         self.communicator = communicator('<bbbbB', '')
 
     def get_input(self) -> dict:
@@ -36,7 +43,11 @@ class Controller:
 
 
 class JoystickController(Controller):
-    def __init__(self, communicator) -> None:
+    def __init__(
+            self,
+            communicator: typing.Callable[[str, str], Communicator]
+            ) -> None:
+
         super().__init__(communicator)
 
         pygame.joystick.init()
@@ -65,8 +76,7 @@ class JoystickController(Controller):
         }
         arm_y = -(round(self.joystick.get_axis(2), 2) ** 3) / 2
 
-        if (abs(arm['horizontal']) < 0.1
-                and abs(arm['vertical']) < 0.1
+        if (abs(arm['horizontal']) < 0.1 and abs(arm['vertical']) < 0.1
                 and abs(arm_y) < 0.1):
 
             x = -round(self.joystick.get_axis(0), 2)
@@ -75,8 +85,8 @@ class JoystickController(Controller):
             right = max(-1.0, min(1.0, y + x))
             left = max(-1.0, min(1.0, y - x))
 
-            right = right**3
-            left = left**3
+            right = right ** 3
+            left = left ** 3
         else:
             right = left = arm_y
 
@@ -90,7 +100,11 @@ class JoystickController(Controller):
 
 
 class KeyboardController(Controller):
-    def __init__(self, communicator) -> None:
+    def __init__(
+            self,
+            communicator: typing.Callable[[str, str], Communicator]
+            ) -> None:
+
         super().__init__(communicator)
 
         self.grabbed = False

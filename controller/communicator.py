@@ -87,15 +87,6 @@ class Communicator:
 
 class DummyCommunicator(Communicator):
     def read(self) -> tuple:
-        print('DummyCommunicator: reading')
-        return ()
-
-    def write(self, *data) -> None:
-        print('DummyCommunicator: writing: {}'.format(data))
-
-
-class StructDummyCommunicator(Communicator):
-    def read(self) -> tuple:
         print('StructDummyCommunicator: reading')
         return ()
 
@@ -115,7 +106,7 @@ class StructDummyCommunicator(Communicator):
         print(msg.strip())
 
 
-class StructSerial(Communicator):
+class SerialCommunicator(Communicator):
     def __init__(self,
                  serial: serial.Serial,
                  send_fmt: str, recv_fmt: str) -> None:
@@ -129,12 +120,12 @@ class StructSerial(Communicator):
             serial: serial.Serial
             ) -> typing.Callable[[str, str], Communicator]:
 
-        def StructSerial_instantiator(send_fmt: str,
-                                      recv_fmt: str) -> Communicator:
+        def instantiator(send_fmt: str,
+                         recv_fmt: str) -> Communicator:
 
-            return StructSerial(serial, send_fmt, recv_fmt)
+            return cls(serial, send_fmt, recv_fmt)
 
-        return StructSerial_instantiator
+        return instantiator
 
     def close(self) -> None:
         self.serial.close()
