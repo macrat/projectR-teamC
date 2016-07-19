@@ -1,121 +1,131 @@
 import pygame
 from pygame.locals import *
-import typing
 
 
 class Controller:
-	def __init__(self, communicator) -> None:
-		self.communicator = communicator('<bbbbB', '')
+    def __init__(self, communicator) -> None:
+        self.communicator = communicator('<bbbbB', '')
 
-	def get_input(self) -> dict:
-		raise NotImplemented()
+    def get_input(self) -> dict:
+        raise NotImplemented()
 
-	def __dict__(self) -> dict:
-		return self.get_input()
+    def __dict__(self) -> dict:
+        return self.get_input()
 
-	def float2fixed(self, x: float) -> int:
-		"""
-		>>> from communicator import DummyCommunicator
-		>>> Controller(DummyCommunicator).float2fixed(1.0)
-		127
-		>>> Controller(DummyCommunicator).float2fixed(-1.0)
-		-127
-		"""
+    def float2fixed(self, x: float) -> int:
+        """
+        >>> from communicator import DummyCommunicator
+        >>> Controller(DummyCommunicator).float2fixed(1.0)
+        127
+        >>> Controller(DummyCommunicator).float2fixed(-1.0)
+        -127
+        """
 
-		return int(round(x * 127, 1))
+        return int(round(x * 127, 1))
 
-	def update(self) -> None:
-		inp = self.get_input()
+    def update(self) -> None:
+        inp = self.get_input()
 
-		self.communicator.write(
-			self.float2fixed(inp['body']['left']),
-			self.float2fixed(inp['body']['right']),
-			self.float2fixed(inp['arm']['horizontal']),
-			self.float2fixed(inp['arm']['vertical']),
-			inp['arm']['grab'],
-		)
+        self.communicator.write(
+            self.float2fixed(inp['body']['left']),
+            self.float2fixed(inp['body']['right']),
+            self.float2fixed(inp['arm']['horizontal']),
+            self.float2fixed(inp['arm']['vertical']),
+            inp['arm']['grab'],
+        )
 
 
 class JoystickController(Controller):
-	def __init__(self, communicator) -> None:
-		super().__init__(communicator)
+    def __init__(self, communicator) -> None:
+        super().__init__(communicator)
 
-		pygame.joystick.init()
-		assert pygame.joystick.get_count() >= 1
+        pygame.joystick.init()
+        assert pygame.joystick.get_count() >= 1
 
-		self.joystick = pygame.joystick.Joystick(0)
-		self.joystick.init()
+        self.joystick = pygame.joystick.Joystick(0)
+        self.joystick.init()
 
-		self.grabbed = False
+        self.grabbed = False
 
-	def get_input(self) -> dict:
-		if self.joystick.get_button(5) != 0:
-			self.grabbed = True
-		elif self.joystick.get_button(7) != 0 and abs(self.joystick.get_axis(0)) < 0.1 and abs(self.joystick.get_axis(1)) < 0.1:
-			self.grabbed = False
+    def get_input(self) -> dict:
+        if self.joystick.get_button(5) != 0:
+            self.grabbed = True
 
-		arm = {
-			'horizontal': round(self.joystick.get_axis(3), 2),
-			'vertical': round(self.joystick.get_button(6), 2) - round(self.joystick.get_button(4), 2),
-			'grab': int(self.grabbed),
-		}
-		arm_y = -(round(self.joystick.get_axis(2), 2) ** 3) / 2
+        elif (self.joystick.get_button(7) != 0
+              and abs(self.joystick.get_axis(0)) < 0.1
+              and abs(self.joystick.get_axis(1)) < 0.1):
 
-		if abs(arm['horizontal']) < 0.1 and abs(arm['vertical']) < 0.1 and abs(arm_y) < 0.1:
-			x = -round(self.joystick.get_axis(0), 2)
-			y = -round(self.joystick.get_axis(1), 2)
+            self.grabbed = False
 
-			right = max(-1.0, min(1.0, y + x))
-			left = max(-1.0, min(1.0, y - x))
+        arm = {
+            'horizontal': round(self.joystick.get_axis(3), 2),
+            'vertical': (round(self.joystick.get_button(6), 2)
+                         - round(self.joystick.get_button(4), 2)),
+            'grab': int(self.grabbed),
+        }
+        arm_y = -(round(self.joystick.get_axis(2), 2) ** 3) / 2
 
-			right = right**3
-			left = left**3
-		else:
-			right = left = arm_y
+        if (abs(arm['horizontal']) < 0.1
+                and abs(arm['vertical']) < 0.1
+                and abs(arm_y) < 0.1):
 
-		return {
-			'body': {
-				'right': right,
-				'left': left,
-			},
-			'arm': arm,
-		}
+            x = -round(self.joystick.get_axis(0), 2)
+            y = -round(self.joystick.get_axis(1), 2)
+
+            right = max(-1.0, min(1.0, y + x))
+            left = max(-1.0, min(1.0, y - x))
+
+            right = right**3
+            left = left**3
+        else:
+            right = left = arm_y
+
+        return {
+            'body': {
+                'right': right,
+                'left': left,
+            },
+            'arm': arm,
+        }
 
 
 class KeyboardController(Controller):
-	def __init__(self, communicator) -> None:
-		super().__init__(communicator)
+    def __init__(self, communicator) -> None:
+        super().__init__(communicator)
 
-		self.grabbed = False
+        self.grabbed = False
 
-	def get_input(self) -> dict:
-		key = pygame.key.get_pressed()
+    def get_input(self) -> dict:
+        key = pygame.key.get_pressed()
 
-		if key[K_f]:
-			self.grabbed = True
-		elif key[K_r] and not key[K_UP] and not key[K_DOWN] and not key[K_LEFT] and not key[K_RIGHT]:
-			self.grabbed = False
+        if key[K_f]:
+            self.grabbed = True
+        elif (key[K_r]
+              and not key[K_UP] and not key[K_DOWN]
+              and not key[K_LEFT] and not key[K_RIGHT]):
 
-		arm = {
-			'horizontal': key[K_d] - key[K_a],
-			'vertical': key[K_e] - key[K_q],
-			'grab': int(self.grabbed),
-		}
-		arm_y = (key[K_w] - key[K_s]) / 2
+            self.grabbed = False
 
-		if arm['horizontal'] == 0 and arm['vertical'] == 0 and arm_y == 0:
-			x = key[K_LEFT] - key[K_RIGHT]
-			y = key[K_UP] - key[K_DOWN]
+        arm = {
+            'horizontal': key[K_d] - key[K_a],
+            'vertical': key[K_e] - key[K_q],
+            'grab': int(self.grabbed),
+        }
+        arm_y = (key[K_w] - key[K_s]) / 2
 
-			right = max(-1.0, min(1.0, y + x))
-			left = max(-1.0, min(1.0, y - x))
-		else:
-			right = left = arm_y
+        if arm['horizontal'] == 0 and arm['vertical'] == 0 and arm_y == 0:
+            x = key[K_LEFT] - key[K_RIGHT]
+            y = key[K_UP] - key[K_DOWN]
 
-		return {
-			'body': {
-				'right': right,
-				'left': left,
-			},
-			'arm': arm,
-		}
+            right = max(-1.0, min(1.0, y + x))
+            left = max(-1.0, min(1.0, y - x))
+        else:
+            right = left = arm_y
+
+        return {
+            'body': {
+                'right': right,
+                'left': left,
+            },
+            'arm': arm,
+        }
