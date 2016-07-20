@@ -1,3 +1,5 @@
+import threading
+import time
 import typing
 
 import pygame
@@ -31,16 +33,41 @@ class Controller:
 
         return int(round(x * 127, 1))
 
-    def update(self) -> None:
+    def send_packet(self, packet: tuple) -> None:
+        self.communicator.write(*packet)
+
+    def make_packet(self, inp: dict) -> tuple:
         inp = self.get_input()
 
-        self.communicator.write(
+        return (
             self.float2fixed(inp['body']['left']),
             self.float2fixed(inp['body']['right']),
             self.float2fixed(inp['arm']['horizontal']),
             self.float2fixed(inp['arm']['vertical']),
             inp['arm']['grab'],
         )
+
+    def send_loop(self) -> None:
+        before = ()
+
+        while True:
+            try:
+                inp = self.get_input()
+            except pygame.error as e:
+                if e.args[0] != 'video system not initialized':
+                    raise
+                break
+
+            inp = self.make_packet(inp)
+
+            if before != inp:
+                self.send_packet(inp)
+                time.sleep(0.1)
+
+            before = inp
+
+    def start_send_loop(self) -> None:
+        threading.Thread(target=self.send_loop).start()
 
 
 class JoystickController(Controller):

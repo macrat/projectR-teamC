@@ -17,6 +17,7 @@ class Window:
                                               pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
         self.controller = controller
+        self.controller.start_send_loop()
 
         pygame.font.init()
         self.font = pygame.font.SysFont(None, 40)
@@ -32,8 +33,6 @@ class Window:
                     self.height = e.h
                     self.screen = pygame.display.set_mode((e.w, e.h),
                                                           pygame.RESIZABLE)
-
-            self.controller.update()
 
             self.screen.fill((0, 0, 0))
             self.update()
