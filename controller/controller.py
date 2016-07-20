@@ -107,14 +107,17 @@ class JoystickController(Controller):
         if (abs(arm['horizontal']) < 0.1 and abs(arm['vertical']) < 0.1
                 and abs(arm_y) < 0.1):
 
-            x = -round(self.joystick.get_axis(0), 2)
-            y = -round(self.joystick.get_axis(1), 2)
+            if self.joystick.get_button(1):
+                x = -round(self.joystick.get_axis(0), 2)
+                y = -round(self.joystick.get_axis(1), 2)
 
-            right = max(-1.0, min(1.0, y + x))
-            left = max(-1.0, min(1.0, y - x))
+                right = max(-1.0, min(1.0, y + x))
+                left = max(-1.0, min(1.0, y - x))
 
-            right = right ** 3
-            left = left ** 3
+                right = right ** 3
+                left = left ** 3
+            else:
+                right = left = -round(self.joystick.get_axis(1), 2)
         else:
             right = left = arm_y
 
@@ -122,6 +125,7 @@ class JoystickController(Controller):
             'body': {
                 'right': right,
                 'left': left,
+                'free_run': self.joystick.get_button(1) != 0,
             },
             'arm': arm,
         }

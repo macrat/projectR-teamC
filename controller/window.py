@@ -106,3 +106,9 @@ class Window:
             self.draw_text(0.5, 0.5, 'grab', color=(0, 0, 0))
         else:
             self.draw_text(0.5, 0.5, 'release')
+
+        free_run = inp['body'].get('free_run')
+        if free_run is True:
+            self.draw_text(0.5, 0.1, 'free run')
+        elif free_run is not None:
+            self.draw_text(0.5, 0.1, 'line run')

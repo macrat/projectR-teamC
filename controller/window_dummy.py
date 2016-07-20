@@ -61,3 +61,9 @@ class DummyWindow(Window):
                     - math.sin(self.heading)*40)
             ),
         )
+
+        free_run = inp['body'].get('free_run')
+        if free_run is True:
+            self.draw_text(0.5, 0.1, 'free run')
+        elif free_run is not None:
+            self.draw_text(0.5, 0.1, 'line run')
