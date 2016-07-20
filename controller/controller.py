@@ -36,7 +36,7 @@ class Controller:
     def send_packet(self, packet: tuple) -> None:
         self.communicator.write(*packet)
 
-    def make_packet(self, inp: dict) -> tuple:
+    def make_packet(self) -> tuple:
         inp = self.get_input()
 
         return (
@@ -52,13 +52,11 @@ class Controller:
 
         while True:
             try:
-                inp = self.get_input()
+                inp = self.make_packet()
             except pygame.error as e:
                 if e.args[0] != 'video system not initialized':
                     raise
                 break
-
-            inp = self.make_packet(inp)
 
             if before != inp:
                 self.send_packet(inp)
