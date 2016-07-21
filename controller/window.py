@@ -58,17 +58,17 @@ class Window:
 
         if horizontal:
             pygame.draw.rect(self.screen, (255, 255, 255), (
-                (left + right)/2 * self.width,
+                (left + right) / 2 * self.width,
                 top * self.height,
-                (right - left)/2 * percent * self.width,
+                (right - left) / 2 * percent * self.width,
                 (bottom - top) * self.height,
             ))
         else:
             pygame.draw.rect(self.screen, (255, 255, 255), (
                 left * self.width,
-                (top + bottom)/2 * self.height,
+                (top + bottom) / 2 * self.height,
                 (right - left) * self.width,
-                (bottom - top)/2 * -percent * self.height,
+                (bottom - top) / 2 * -percent * self.height,
             ))
 
     def draw_text(
@@ -79,14 +79,14 @@ class Window:
         assert 0 <= x <= 1 and 0 <= y <= 1
 
         img = self.font.render(text, 1, color)
-        self.screen.blit(img, (x * self.width - img.get_width()/2,
-                               y * self.height - img.get_height()/2))
+        self.screen.blit(img, (x * self.width - img.get_width() / 2,
+                               y * self.height - img.get_height() / 2))
 
     def update(self) -> None:
         inp = self.controller.get_input()
 
         for x, name in ((0.05, 'left'), (0.1, 'right')):
-            self.draw_bar(x, 0.1, x+0.05, 0.9, inp['body'][name], False)
+            self.draw_bar(x, 0.1, x + 0.05, 0.9, inp['body'][name], False)
         self.draw_text(0.1, 0.05,
                        '{left: 5.0%} {right: 5.0%}'.format(**inp['body']))
 

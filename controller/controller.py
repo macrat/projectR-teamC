@@ -11,10 +11,9 @@ PacketType = typing.Dict[str, typing.Dict[str, float]]
 
 
 class Controller:
-    def __init__(
-            self,
-            communicator: typing.Callable[[str, str], Communicator]
-            ) -> None:
+    def __init__(self,
+                 communicator: typing.Callable[[str, str], Communicator]
+                 ) -> None:
 
         self.communicator = communicator('<bbbbB', '<i')
 
@@ -83,10 +82,9 @@ class Controller:
 
 
 class JoystickController(Controller):
-    def __init__(
-            self,
-            communicator: typing.Callable[[str, str], Communicator]
-            ) -> None:
+    def __init__(self,
+                 communicator: typing.Callable[[str, str], Communicator]
+                 ) -> None:
 
         super().__init__(communicator)
 
@@ -144,10 +142,9 @@ class JoystickController(Controller):
 
 
 class KeyboardController(Controller):
-    def __init__(
-            self,
-            communicator: typing.Callable[[str, str], Communicator]
-            ) -> None:
+    def __init__(self,
+                 communicator: typing.Callable[[str, str], Communicator]
+                 ) -> None:
 
         super().__init__(communicator)
 

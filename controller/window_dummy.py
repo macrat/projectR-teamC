@@ -6,8 +6,8 @@ from window import Window
 
 
 class DummyWindow(Window):
-    x = Window.width/2
-    y = Window.height/2
+    x = Window.width / 2
+    y = Window.height / 2
     heading = 0.0
     arm_h = 0.0
     arm_v = 0.5
@@ -31,10 +31,8 @@ class DummyWindow(Window):
         pygame.draw.circle(
             self.screen,
             (255, 255, 255),
-            (
-                int(self.x + self.arm_h*math.cos(self.heading+math.pi/2)),
-                int(self.y + self.arm_h*math.sin(self.heading+math.pi/2))
-            ),
+            (int(self.x + self.arm_h * math.cos(self.heading + math.pi / 2)),
+             int(self.y + self.arm_h * math.sin(self.heading + math.pi / 2))),
             int(40 * self.arm_v),
             0 if inp['arm']['grab'] else 1
         )
@@ -48,17 +46,15 @@ class DummyWindow(Window):
         pygame.draw.line(
             self.screen,
             (255, 255, 255),
-            (
-                int(self.x + self.arm_h*math.cos(self.heading+math.pi/2)),
-                int(self.y + self.arm_h*math.sin(self.heading+math.pi/2))
-            ),
+            (int(self.x + self.arm_h * math.cos(self.heading + math.pi / 2)),
+             int(self.y + self.arm_h * math.sin(self.heading + math.pi / 2))),
             (
                 int(self.x
-                    + self.arm_h * math.cos(self.heading+math.pi/2)
-                    - math.cos(self.heading)*40),
+                    + self.arm_h * math.cos(self.heading + math.pi / 2)
+                    - math.cos(self.heading) * 40),
                 int(self.y
-                    + self.arm_h * math.sin(self.heading+math.pi/2)
-                    - math.sin(self.heading)*40)
+                    + self.arm_h * math.sin(self.heading + math.pi / 2)
+                    - math.sin(self.heading) * 40)
             ),
         )
 

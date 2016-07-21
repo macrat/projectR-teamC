@@ -90,7 +90,7 @@ class DummyCommunicator(Communicator):
         print('DummyCommunicator: reading... (will blocking)')
         import time
         while True:
-            time.sleep(60*60)
+            time.sleep(60 * 60)
 
     def write(self, *data) -> None:
         """
@@ -114,20 +114,18 @@ class DummyCommunicator(Communicator):
 class SerialCommunicator(Communicator):
     def __init__(self,
                  serial: serial.Serial,
-                 send_fmt: str, recv_fmt: str) -> None:
+                 send_fmt: str,
+                 recv_fmt: str) -> None:
 
         super().__init__(send_fmt, recv_fmt)
         self.serial = serial
 
     @classmethod
-    def get_instantiator(
-            cls,
-            serial: serial.Serial
-            ) -> typing.Callable[[str, str], Communicator]:
+    def get_instantiator(cls,
+                         serial: serial.Serial
+                         ) -> typing.Callable[[str, str], Communicator]:
 
-        def instantiator(send_fmt: str,
-                         recv_fmt: str) -> Communicator:
-
+        def instantiator(send_fmt: str, recv_fmt: str) -> Communicator:
             return cls(serial, send_fmt, recv_fmt)
 
         return instantiator
