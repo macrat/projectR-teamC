@@ -136,8 +136,8 @@ class SerialCommunicator(Communicator):
     def read(self) -> tuple:
         buf = b''
 
-        for x in self.serial.read(1):
-            buf += x
+        while True:
+            buf += self.serial.read(1)
 
             if buf.endswith(b'\x10\x02'):
                 buf = b'\x10\x02'
