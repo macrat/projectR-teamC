@@ -87,18 +87,18 @@ class Communicator:
 
 class DummyCommunicator(Communicator):
     def read(self) -> tuple:
-        print('StructDummyCommunicator: reading... (will blocking)')
+        print('DummyCommunicator: reading... (will blocking)')
         import time
         while True:
             time.sleep(60*60)
 
     def write(self, *data) -> None:
         """
-        >>> StructDummyCommunicator('<ii', '').write(1, 2)
-        StructDummyCommunicator: writing: 01 00 00 00 | 02 00 00 00
+        >>> DummyCommunicator('<ii', '').write(1, 2)
+        DummyCommunicator: writing: 01 00 00 00 | 02 00 00 00
         """
 
-        msg = 'StructDummyCommunicator: writing: '
+        msg = 'DummyCommunicator: writing: '
 
         for i, x in enumerate(self.encode_struct(*data)):
             if i != 0 and (i + 0) % 4 == 0:
