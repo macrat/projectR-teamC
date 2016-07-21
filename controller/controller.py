@@ -49,6 +49,7 @@ class Controller:
 
     def send_loop(self) -> None:
         before = ()
+        last_sent = 0
 
         while True:
             try:
@@ -58,11 +59,13 @@ class Controller:
                     raise
                 break
 
-            if before != inp:
+            if last_sent + 1 < time.time() or before != inp:
                 self.send_packet(inp)
-                time.sleep(0.1)
 
-            before = inp
+                before = inp
+                last_sent = time.time()
+
+                time.sleep(0.2)
 
     def start_send_loop(self) -> None:
         threading.Thread(target=self.send_loop).start()
