@@ -71,10 +71,11 @@ class Window:
                 (bottom - top)/2 * -percent * self.height,
             ))
 
-    def draw_text(self,
-                  x: float, y: float,
-                  text: str,
-                  color: typing.Tuple[int] = (255, 255, 255)) -> None:
+    def draw_text(
+            self,
+            x: float, y: float,
+            text: str,
+            color: typing.Tuple[int, int, int] = (255, 255, 255)) -> None:
         assert 0 <= x <= 1 and 0 <= y <= 1
 
         img = self.font.render(text, 1, color)
