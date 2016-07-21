@@ -3,9 +3,11 @@ import time
 import typing
 
 import pygame
-from pygame.locals import *
 
 from communicator import Communicator
+
+
+PacketType = typing.Dict[str, typing.Dict[str, float]]
 
 
 class Controller:
@@ -16,10 +18,10 @@ class Controller:
 
         self.communicator = communicator('<bbbbB', '<i')
 
-    def get_input(self) -> dict:
+    def get_input(self) -> PacketType:
         raise NotImplemented()
 
-    def __dict__(self) -> dict:
+    def __dict__(self):
         return self.get_input()
 
     def float2fixed(self, x: float) -> int:
@@ -36,7 +38,7 @@ class Controller:
     def send_packet(self, packet: tuple) -> None:
         self.communicator.write(*packet)
 
-    def make_packet(self) -> tuple:
+    def make_packet(self) -> typing.Tuple[int, int, int, int, int]:
         inp = self.get_input()
 
         return (
@@ -44,12 +46,12 @@ class Controller:
             self.float2fixed(inp['body']['right']),
             self.float2fixed(inp['arm']['horizontal']),
             self.float2fixed(inp['arm']['vertical']),
-            inp['arm']['grab'],
+            int(inp['arm']['grab']),
         )
 
     def send_loop(self) -> None:
-        before = ()
-        last_sent = 0
+        before = (0, 0, 0, 0, 0)
+        last_sent = 0.0
 
         while True:
             inp = self.make_packet()
@@ -96,7 +98,7 @@ class JoystickController(Controller):
 
         self.grabbed = False
 
-    def get_input(self) -> dict:
+    def get_input(self) -> PacketType:
         if self.joystick.get_button(5) != 0:
             self.grabbed = True
 
@@ -151,27 +153,27 @@ class KeyboardController(Controller):
 
         self.grabbed = False
 
-    def get_input(self) -> dict:
+    def get_input(self) -> PacketType:
         key = pygame.key.get_pressed()
 
-        if key[K_f]:
+        if key[pygame.K_f]:
             self.grabbed = True
-        elif (key[K_r]
-              and not key[K_UP] and not key[K_DOWN]
-              and not key[K_LEFT] and not key[K_RIGHT]):
+        elif (key[pygame.K_r]
+              and not key[pygame.K_UP] and not key[pygame.K_DOWN]
+              and not key[pygame.K_LEFT] and not key[pygame.K_RIGHT]):
 
             self.grabbed = False
 
         arm = {
-            'horizontal': key[K_d] - key[K_a],
-            'vertical': key[K_e] - key[K_q],
+            'horizontal': key[pygame.K_d] - key[pygame.K_a],
+            'vertical': key[pygame.K_e] - key[pygame.K_q],
             'grab': int(self.grabbed),
         }
-        arm_y = (key[K_w] - key[K_s]) / 2
+        arm_y = (key[pygame.K_w] - key[pygame.K_s]) / 2
 
         if arm['horizontal'] == 0 and arm['vertical'] == 0 and arm_y == 0:
-            x = key[K_LEFT] - key[K_RIGHT]
-            y = key[K_UP] - key[K_DOWN]
+            x = key[pygame.K_LEFT] - key[pygame.K_RIGHT]
+            y = key[pygame.K_UP] - key[pygame.K_DOWN]
 
             right = max(-1.0, min(1.0, y + x))
             left = max(-1.0, min(1.0, y - x))
