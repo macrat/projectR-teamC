@@ -17,7 +17,7 @@ class Window:
                                               pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
         self.controller = controller
-        self.controller.start_send_loop()
+        self.controller.start_background()
 
         pygame.font.init()
         self.font = pygame.font.SysFont(None, 40)

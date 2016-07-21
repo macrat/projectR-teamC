@@ -14,7 +14,7 @@ class Controller:
             communicator: typing.Callable[[str, str], Communicator]
             ) -> None:
 
-        self.communicator = communicator('<bbbbB', '')
+        self.communicator = communicator('<bbbbB', '<i')
 
     def get_input(self) -> dict:
         raise NotImplemented()
@@ -52,12 +52,7 @@ class Controller:
         last_sent = 0
 
         while True:
-            try:
-                inp = self.make_packet()
-            except pygame.error as e:
-                if e.args[0] != 'video system not initialized':
-                    raise
-                break
+            inp = self.make_packet()
 
             if last_sent + 1 < time.time() or before != inp:
                 self.send_packet(inp)
@@ -67,8 +62,22 @@ class Controller:
 
                 time.sleep(0.2)
 
-    def start_send_loop(self) -> None:
-        threading.Thread(target=self.send_loop).start()
+    def receive_loop(self) -> None:
+        blocked = False
+
+        while True:
+            new = self.communicator.read()[0] != 0
+            if new != blocked:
+                if new:
+                    print('blocked by sensor')
+                else:
+                    print('released by sensor')
+
+                blocked = new
+
+    def start_background(self) -> None:
+        threading.Thread(target=self.send_loop, daemon=True).start()
+        threading.Thread(target=self.receive_loop, daemon=True).start()
 
 
 class JoystickController(Controller):

@@ -87,8 +87,10 @@ class Communicator:
 
 class DummyCommunicator(Communicator):
     def read(self) -> tuple:
-        print('StructDummyCommunicator: reading')
-        return ()
+        print('StructDummyCommunicator: reading... (will blocking)')
+        import time
+        while True:
+            time.sleep(60*60)
 
     def write(self, *data) -> None:
         """
@@ -104,6 +106,9 @@ class DummyCommunicator(Communicator):
             msg += '{0:02x} '.format(x)
 
         print(msg.strip())
+
+        import time
+        time.sleep(0.1)
 
 
 class SerialCommunicator(Communicator):
