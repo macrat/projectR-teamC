@@ -107,9 +107,9 @@ class JoystickController(Controller):
             self.grabbed = False
 
         arm = {
-            'horizontal': round(self.joystick.get_axis(3), 2),
-            'vertical': (round(self.joystick.get_button(6), 2)
-                         - round(self.joystick.get_button(4), 2)),
+            'horizontal': round(self.joystick.get_axis(3) ** 3 / 2, 2),
+            'vertical': (self.joystick.get_button(6)
+                         - self.joystick.get_button(4)) / 2,
             'grab': int(self.grabbed),
         }
         arm_y = -(round(self.joystick.get_axis(2), 2) ** 3) / 2
