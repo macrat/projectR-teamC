@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/macrat/projectR-teamC.svg?branch=master)](https://travis-ci.org/macrat/projectR-teamC)
+
 Overview
 ========
 プロジェクト実習テーマR チームCの制御プログラム
