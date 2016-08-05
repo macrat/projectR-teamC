@@ -1,0 +1,8 @@
+language: python
+
+python:
+  - 3.5
+
+install: pip install -r controller/requirements.txt
+
+script: cd controller && python -m doctest *.py
